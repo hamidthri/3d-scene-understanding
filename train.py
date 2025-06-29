@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from dataset import ModelNet10Dataset
 from model import PointNetClassifier
@@ -111,7 +112,42 @@ def train_pointnet(
         'num_points': num_points,
         'feature_transform': feature_transform
     }, 'pointnet_final.pth')
-        
+    
+    # Plot training curves
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.plot(train_losses)
+    plt.title('Training Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.grid(True)
+
+    plt.subplot(1, 3, 2)
+    plt.plot(train_accuracies, label='Train')
+    plt.plot(test_accuracies, label='Test')
+    plt.title('Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy (%)')
+    plt.legend()
+    plt.grid(True)
+
+    plt.subplot(1, 3, 3)
+    plt.plot(test_accuracies)
+    plt.title('Test Accuracy Over Time')
+    plt.xlabel('Epoch')
+    plt.ylabel('Test Accuracy (%)')
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.savefig('training_curves.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
+    print(f"Final Test Accuracy: {test_acc:.2f}%")
+    print("Training completed!")
+
+    return model, train_dataset.classes
+
 
 if __name__ == "__main__":
     model, classes = train_pointnet(
