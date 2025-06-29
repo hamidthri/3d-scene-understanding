@@ -70,6 +70,47 @@ def train_pointnet(
         train_losses.append(train_loss)
         train_accuracies.append(train_acc)
         
+        # Test
+        model.eval()
+        correct_test = 0
+        total_test = 0
+
+        with torch.no_grad():
+            test_pbar = tqdm(test_loader, desc=f'Epoch {epoch+1}/{epochs} - Testing')
+            for data, target in test_pbar:
+                data, target = data.to(device), target.to(device)
+                pred, _, _ = model(data)
+                pred_choice = pred.max(1)[1]
+                correct_test += pred_choice.eq(target).sum().item()
+                total_test += target.size(0)
+
+                test_pbar.set_postfix({
+                    'Acc': f'{100. * correct_test / total_test:.2f}%'
+                })
+
+        test_acc = 100. * correct_test / total_test
+        test_accuracies.append(test_acc)
+
+        print(f'Epoch {epoch+1}: Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%, Test Acc: {test_acc:.2f}%')
+
+        scheduler.step()
+
+        if (epoch + 1) % 10 == 0:
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'train_loss': train_loss,
+                'test_acc': test_acc,
+            }, f'pointnet_epoch_{epoch+1}.pth')
+
+    # Save final model and metadata
+    torch.save({
+        'model_state_dict': model.state_dict(),
+        'classes': train_dataset.classes,
+        'num_points': num_points,
+        'feature_transform': feature_transform
+    }, 'pointnet_final.pth')
         
 
 if __name__ == "__main__":
