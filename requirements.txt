@@ -1,0 +1,8 @@
+trimesh
+torch
+matplotlib
+torchvision
+numpy
+scikit-learn
+seaborn
+open3d
