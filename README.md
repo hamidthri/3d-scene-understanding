@@ -41,7 +41,7 @@ python predict.py
 
 ## Results
 
-The PointNet-Custom model was evaluated on the **ModelNet10** test set, consisting of 908 samples across 10 object categories. The classification report below summarizes precision, recall, and F1-score per class:
+The PointNet-Custom model was evaluated on the **ModelNet10** test set, consisting of 908 samples across 10 object categories. The classification report below summarizes precision, recall, and F1-score per class after 10 epochs:
 
 ### Classification Report
 
