@@ -3,7 +3,7 @@ A custom reimplementation of the PointNet architecture for point cloud classific
 
 
 ## Architecture
-![PointNet Architecture](images/pointnet.png)
+![PointNet Architecture](https://github.com/hamidthri/pointnet-custom/blob/master/assets/pointnet.png)
 
 ## Prerequisites
 
