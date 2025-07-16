@@ -2,3 +2,9 @@
 */__pycache__/
 .venv/
 ModelNet10/
+ModelNet10.zip
+__pycache__
+__MACOSX/
+*.pyc
+*.pyo
+

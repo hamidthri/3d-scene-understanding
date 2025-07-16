@@ -6,8 +6,8 @@ from torch.utils.data import DataLoader
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report
 import random
-from model import PointNetClassifier
-from dataset import ModelNet10Dataset
+from models.pointnet import PointNetClassifier
+from datsets.modelnet10 import ModelNet10
 
 
 def load_model(model_path='pointnet_final.pth', device='cpu', data_dir=None):

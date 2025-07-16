@@ -5,7 +5,7 @@ import os
 import trimesh
 
 
-class ModelNet10Dataset(data.Dataset):
+class ModelNet10(data.Dataset):
     def __init__(self, root_dir, split='train', num_points=1024):
         self.root_dir = root_dir
         self.split = split

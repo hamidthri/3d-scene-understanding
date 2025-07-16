@@ -5,8 +5,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from dataset import ModelNet10Dataset
-from model import PointNetClassifier
+from models.pointnet.classification import PointNetClassifier
+from datasets.modelnet10 import ModelNet10
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -18,8 +18,8 @@ def train_pointnet(
         num_points=2048,
         feature_transform=True):
     
-    train_dataset = ModelNet10Dataset(data_dir, split='train', num_points=num_points)
-    test_dataset = ModelNet10Dataset(data_dir, split='test', num_points=num_points)
+    train_dataset = ModelNet10(data_dir, split='train', num_points=num_points)
+    test_dataset = ModelNet10(data_dir, split='test', num_points=num_points)
     
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
