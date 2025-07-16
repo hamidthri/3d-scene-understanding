@@ -77,7 +77,7 @@ def visualize_point_cloud(points, title="Point Cloud", color='blue'):
     plt.tight_layout()
     return fig, ax
 
-def evaluate_model(model_path='pointnet_final.pth',
+def evaluate_model(model_path='assets/checkpoints/pointnet_final.pth',
                   data_dir='./modelnet10_data',
                   visualize_samples=True,
                   num_viz_samples=6):
