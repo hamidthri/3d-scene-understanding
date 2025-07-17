@@ -4,17 +4,16 @@ A custom reimplementation of 3D deep learning architectures including **PointNet
 
 ---
 
-## 📌 Key Features
+## Key Features
 
 - Implementation of **PointNet**, **PointNet++**, and **DGCNN** architectures.
 - Support for **classification** and **segmentation** on 3D point clouds.
 - Training and evaluation on the **ModelNet10** dataset.
-- Modular codebase for easy extension and experimentation.
-- Visualizations for predictions and class-wise performance reports.
+
 
 ---
 
-## 🏗 Architectures
+## Architectures
 
 ### 🔹 PointNet
 ![PointNet Architecture](assets/pointnet.png)
@@ -33,7 +32,7 @@ A custom reimplementation of 3D deep learning architectures including **PointNet
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 Install the required dependencies:
 
