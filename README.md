@@ -39,20 +39,6 @@ Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
-
-
-# 3D Scene Understanding
-A custom reimplementation of the different architectures including pointnet, pointnet++, and DGCNN for point cloud classification using the ModelNet10 dataset and segmentation.
-
-
-## Pointnet Architecture
-![PointNet Architecture](assets/pointnet.png)
-
-## Prerequisites
-
-Install dependencies:
-```bash
-pip install requirements.txt
 ```
 
 ## Installation
