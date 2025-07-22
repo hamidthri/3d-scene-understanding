@@ -4,7 +4,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Point Cloud Classification Training')
     
     parser.add_argument('--model', type=str, default='pointnet', 
-                       choices=['pointnet', 'pointnet++', 'dgcnn'],
+                       choices=['pointnet', 'pointnet++', 'dgcnn', 'pointmlp'],
                        help='Model architecture to use')
     parser.add_argument('--data_dir', type=str, default='./ModelNet10',
                        help='Path to dataset directory')
@@ -14,7 +14,7 @@ def get_args():
                        help='Number of epochs to train')
     parser.add_argument('--learning_rate', type=float, default=0.001,
                        help='Learning rate for optimizer')
-    parser.add_argument('--num_points', type=int, default=2048,
+    parser.add_argument('--num_points', type=int, default=1024,
                        help='Number of points to sample from each point cloud')
     parser.add_argument('--feature_transform', action='store_true', default=True,
                        help='Use feature transform in PointNet')
@@ -22,7 +22,7 @@ def get_args():
                        help='Directory to save checkpoints')
     parser.add_argument('--save_interval', type=int, default=10,
                        help='Save checkpoint every N epochs')
-    parser.add_argument('--num_workers', type=int, default=4,
+    parser.add_argument('--num_workers', type=int, default=0,
                        help='Number of workers for data loading')
     parser.add_argument('--device', type=str, default='auto',
                        choices=['auto', 'cuda', 'cpu'],

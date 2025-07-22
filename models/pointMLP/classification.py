@@ -25,4 +25,4 @@ class PointMLPClassifier(nn.Module):
     def forward(self, x):
         features = self.encoder(x)
         x = self.classifier(features)
-        return F.log_softmax(x, dim=1)
+        return F.log_softmax(x, dim=1), None, None
