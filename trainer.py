@@ -28,13 +28,15 @@ class Trainer:
             self.criterion = ContrastiveLoss(
                 classification_weight=1.0,
                 contrastive_weight=getattr(args, 'contrastive_weight', 0.1),
-                consistency_weight=getattr(args, 'consistency_weight', 0.05)
+                consistency_weight=getattr(args, 'consistency_weight', 0.05),
+                warmup_epochs=getattr(args, 'contrastive_warmup_epochs', 1)  # 🆕
             )
         else:
             self.criterion = SegmentationContrastiveLoss(
                 classification_weight=1.0,
                 contrastive_weight=getattr(args, 'contrastive_weight', 0.1),
-                consistency_weight=getattr(args, 'consistency_weight', 0.05)
+                consistency_weight=getattr(args, 'consistency_weight', 0.05),
+                warmup_epochs=getattr(args, 'contrastive_warmup_epochs', 1)  # 🆕
             )
         
         self.train_losses = []
@@ -44,6 +46,11 @@ class Trainer:
         self.consistency_losses = []
         
         os.makedirs(args.checkpoint_dir, exist_ok=True)
+        if getattr(args, 'resume_from', None):
+            print(f"Loading model from checkpoint: {args.resume_from}")
+            checkpoint = torch.load(args.resume_from, map_location=self.device)
+            self.model.load_state_dict(checkpoint['model_state_dict'])
+
     
     def _get_device(self):
         if self.args.device == 'auto':
@@ -62,10 +69,9 @@ class Trainer:
         
         for data, target in train_pbar:
             data, target = data.to(self.device), target.to(self.device)
-            
             self.optimizer.zero_grad()
-            
-            if hasattr(self.model, 'use_contrastive') and self.model.use_contrastive:
+
+            if getattr(self.model, 'use_contrastive', False):
                 pred, contrastive_loss, consistency_loss = self.model(data, target)
                 total_loss, classification_loss, cont_loss_val, cons_loss_val = self.criterion(
                     pred, target, contrastive_loss, consistency_loss
@@ -100,7 +106,7 @@ class Trainer:
         avg_consistency_loss = running_consistency_loss / len(self.train_loader)
         
         return train_loss, train_acc, avg_contrastive_loss, avg_consistency_loss
-    
+
     def train_epoch_segmentation(self, epoch):
         self.model.train()
         running_loss = 0.0
@@ -113,10 +119,9 @@ class Trainer:
         
         for data, target in train_pbar:
             data, target = data.to(self.device), target.to(self.device)
-            
             self.optimizer.zero_grad()
-            
-            if hasattr(self.model, 'use_contrastive') and self.model.use_contrastive:
+
+            if getattr(self.model, 'use_contrastive', False):
                 pred, contrastive_loss, consistency_loss = self.model(data, target)
                 total_loss, classification_loss, cont_loss_val, cons_loss_val = self.criterion(
                     pred, target, contrastive_loss, consistency_loss
@@ -152,7 +157,7 @@ class Trainer:
         avg_consistency_loss = running_consistency_loss / len(self.train_loader)
         
         return train_loss, train_acc, avg_contrastive_loss, avg_consistency_loss
-    
+
     def test_epoch_classification(self, epoch):
         self.model.eval()
         correct_test = 0
@@ -172,9 +177,8 @@ class Trainer:
                     'Acc': f'{100. * correct_test / total_test:.2f}%'
                 })
         
-        test_acc = 100. * correct_test / total_test
-        return test_acc
-    
+        return 100. * correct_test / total_test
+
     def test_epoch_segmentation(self, epoch):
         self.model.eval()
         correct_test = 0
@@ -196,9 +200,8 @@ class Trainer:
                     'Acc': f'{100. * correct_test / total_test:.2f}%'
                 })
         
-        test_acc = 100. * correct_test / total_test
-        return test_acc
-    
+        return 100. * correct_test / total_test
+
     def save_checkpoint(self, epoch, train_loss, test_acc, contrastive_loss, consistency_loss):
         checkpoint_path = os.path.join(self.args.checkpoint_dir, f'enhanced_pointnet_epoch_{epoch+1}.pth')
         torch.save({
@@ -210,14 +213,13 @@ class Trainer:
             'contrastive_loss': contrastive_loss,
             'consistency_loss': consistency_loss,
         }, checkpoint_path)
-    
+
     def save_final_model(self):
         save_dict = {
             'model_state_dict': self.model.state_dict(),
             'classes': self.classes,
             'task_type': self.task_type,
         }
-        
         if hasattr(self.args, 'num_points'):
             save_dict['num_points'] = self.args.num_points
         if hasattr(self.args, 'feature_transform'):
@@ -226,17 +228,23 @@ class Trainer:
             save_dict['use_contrastive'] = self.model.use_contrastive
             
         torch.save(save_dict, f'enhanced_pointnet_{self.task_type}_final.pth')
-    
+
     def train(self):
         print(f"Training on device: {self.device}")
         print(f"Train samples: {len(self.train_loader.dataset)}")
         print(f"Test samples: {len(self.test_loader.dataset)}")
         print(f"Task type: {self.task_type}")
         
-        if hasattr(self.model, 'use_contrastive'):
-            print(f"Using contrastive sampling: {self.model.use_contrastive}")
-        
         for epoch in range(self.args.epochs):
+            # 🆕 Enable contrastive sampling after warmup
+            if hasattr(self.model, 'use_contrastive'):
+                self.model.use_contrastive = epoch >= getattr(self.args, 'contrastive_warmup_epochs', 1)
+                print(f"Using contrastive sampling: {self.model.use_contrastive}")
+            
+            # 🆕 Warm-up logic for loss weights
+            if hasattr(self.criterion, 'set_epoch'):
+                self.criterion.set_epoch(epoch)
+
             if self.task_type == 'classification':
                 train_loss, train_acc, contrastive_loss, consistency_loss = self.train_epoch_classification(epoch)
                 test_acc = self.test_epoch_classification(epoch)

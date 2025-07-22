@@ -29,8 +29,8 @@ class ExperimentRunner:
         enhanced_model = EnhancedPointNetPlusPlusClassifier(k=len(classes), use_contrastive=True)
         
         print("\n1. Training Baseline PointNet++...")
-        baseline_trainer = Trainer(baseline_model, train_loader, test_loader, self.args, classes, 'classification')
-        baseline_results = baseline_trainer.train()
+        # baseline_trainer = Trainer(baseline_model, train_loader, test_loader, self.args, classes, 'classification')
+        # baseline_results = baseline_trainer.train()
         
         print("\n2. Training Enhanced PointNet++ with Contrastive Sampling...")
         enhanced_trainer = Trainer(enhanced_model, train_loader, test_loader, self.args, classes, 'classification')
@@ -197,6 +197,8 @@ def create_experiment_args():
     parser.add_argument('--num_workers', type=int, default=4, help='Number of worker threads for DataLoader')
     parser.add_argument('--data_dir', type=str, default='ModelNet10', help='Path to dataset directory')  # ✅ FIX
     parser.add_argument('--task', type=str, choices=['classification', 'segmentation'], required=True, help='Task to run: classification or segmentation')
+    parser.add_argument('--resume_from', type=str, default=None, help='Path to model checkpoint to resume or evaluate from')
+
 
     
     return parser.parse_args()
