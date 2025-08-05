@@ -30,11 +30,15 @@ A custom reimplementation of 3D deep learning architectures including **PointNet
 
 > DGCNN (Dynamic Graph CNN) dynamically constructs a local graph for each point and applies edge convolutions to learn features based on relative point relationships. This model effectively captures local geometric context and is particularly strong in tasks requiring spatial awareness like segmentation.
 
+<!-- add pointmlp -->
+### 🔹 PointMLP
+![PointMLP Architecture](assets/pointmlp.png)
+
+> PointMLP (Point Multi-Layer Perceptron) is a simple yet effective architecture that leverages MLPs for point cloud processing. It applies shared MLPs to each point independently, making it highly efficient and easy to implement. While it may not capture local structures as effectively as other methods, it serves as a strong baseline for point cloud tasks.
+
 ---
 
 ## Prerequisites
-
-Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
