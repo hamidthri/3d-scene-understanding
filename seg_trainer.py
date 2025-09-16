@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
+import time
 
 class SegmentationTrainer:
     def __init__(self, model, train_loader, test_loader, args,
@@ -45,11 +47,15 @@ class SegmentationTrainer:
         self.tb = None
         if getattr(self.args, "use_tensorboard", False):
             try:
-                from torch.utils.tensorboard import SummaryWriter
-                run_name = f"seg_{self.args.model}"
-                self.tb = SummaryWriter(log_dir=os.path.join("runs", run_name))
-            except Exception:
+                run_name = f"seg_{self.args.model}_{time.strftime('%Y%m%d_%H%M%S')}"
+                tb_dir = os.path.join(self.args.checkpoint_dir, "runs", run_name)
+                os.makedirs(tb_dir, exist_ok=True)
+                print(f"[TensorBoard] Logging to: {tb_dir}")
+                self.tb = SummaryWriter(log_dir=tb_dir)
+            except Exception as e:
+                print(f"[TensorBoard] Failed to init SummaryWriter: {e}")
                 self.tb = None
+
 
     def _get_device(self):
         if self.args.device == 'auto':
