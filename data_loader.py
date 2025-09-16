@@ -3,7 +3,6 @@ from datasets.modelnet10 import ModelNet10
 from datasets.ShapeNetPart import ShapeNetPart
 import torch
 
-
 def _norm_task(task: str) -> str:
     t = str(task).lower()
     if t in ("cls", "classification"):
