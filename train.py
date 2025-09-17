@@ -1,9 +1,8 @@
-# train.py
 import torch
 from config import get_args
 from data_loader import get_data_loaders
 from model_factory import create_model
-from trainer import Trainer
+from cls_trainer import Trainer
 from seg_trainer import SegmentationTrainer
 from utils.visualization import plot_training_curves
 from model_factory import get_model_info
