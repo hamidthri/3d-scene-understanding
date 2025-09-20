@@ -8,4 +8,4 @@ __MACOSX/
 *.pyc
 *.pyo
 ShapeNetPart/
-assets/checkpoints/
+assets/checkpoints/*.pth

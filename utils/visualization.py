@@ -417,3 +417,134 @@ def save_results_summary(results, save_path='results_summary.txt'):
         f.write("=" * 60 + "\n")
     
     print(f"Results summary saved to: {save_path}")
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import os
+
+
+def visualize_classification_predictions(point_clouds, true_labels, pred_labels, classes, model_name, save_path):
+    n_samples = min(len(point_clouds), 10)
+    fig = plt.figure(figsize=(15, 8))
+    
+    for i in range(n_samples):
+        ax = fig.add_subplot(2, 5, i+1, projection='3d')
+        
+        points = point_clouds[i]
+        if points.shape[0] == 3:
+            points = points.T
+        
+        true_class = classes[true_labels[i]] if true_labels[i] < len(classes) else f"Class_{true_labels[i]}"
+        pred_class = classes[pred_labels[i]] if pred_labels[i] < len(classes) else f"Class_{pred_labels[i]}"
+        
+        correct = true_labels[i] == pred_labels[i]
+        color = 'green' if correct else 'red'
+        
+        ax.scatter(points[:, 0], points[:, 1], points[:, 2], 
+                  c=points[:, 2], cmap='viridis', s=1, alpha=0.8)
+        
+        ax.set_title(f"True: {true_class}\nPred: {pred_class}", 
+                    fontsize=8, color=color, weight='bold')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        ax.tick_params(labelsize=6)
+        
+        ax.view_init(elev=20, azim=45)
+        ax.set_box_aspect([1,1,1])
+    
+    plt.suptitle(f'{model_name.upper()} - Classification Predictions', fontsize=14, weight='bold')
+    plt.tight_layout()
+    
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"Classification visualization saved to: {save_path}")
+
+
+def visualize_segmentation_predictions(point_clouds, true_seg_labels, pred_seg_labels, model_name, save_path):
+    n_samples = min(len(point_clouds), 5)
+    fig = plt.figure(figsize=(18, 8))
+    
+    for i in range(n_samples):
+        points = point_clouds[i]
+        true_segs = true_seg_labels[i]
+        pred_segs = pred_seg_labels[i]
+        
+        if points.shape[0] == 3:
+            points = points.T
+        
+        ax1 = fig.add_subplot(2, n_samples, i+1, projection='3d')
+        ax2 = fig.add_subplot(2, n_samples, i+1+n_samples, projection='3d')
+        
+        unique_true = np.unique(true_segs)
+        unique_pred = np.unique(pred_segs)
+        
+        colors_true = plt.cm.Set1(np.linspace(0, 1, len(unique_true)))
+        colors_pred = plt.cm.Set1(np.linspace(0, 1, len(unique_pred)))
+        
+        for j, part in enumerate(unique_true):
+            mask = true_segs == part
+            ax1.scatter(points[mask, 0], points[mask, 1], points[mask, 2], 
+                       c=[colors_true[j]], s=2, alpha=0.8, label=f'Part {part}')
+        
+        for j, part in enumerate(unique_pred):
+            mask = pred_segs == part
+            ax2.scatter(points[mask, 0], points[mask, 1], points[mask, 2], 
+                       c=[colors_pred[j]], s=2, alpha=0.8, label=f'Part {part}')
+        
+        accuracy = np.mean(true_segs == pred_segs)
+        
+        ax1.set_title(f"Ground Truth\nSample {i+1}", fontsize=9, weight='bold')
+        ax2.set_title(f"Prediction\nAccuracy: {accuracy:.2f}", 
+                     fontsize=9, weight='bold', 
+                     color='green' if accuracy > 0.8 else 'orange' if accuracy > 0.6 else 'red')
+        
+        for ax in [ax1, ax2]:
+            ax.set_xlabel('X', fontsize=7)
+            ax.set_ylabel('Y', fontsize=7)
+            ax.set_zlabel('Z', fontsize=7)
+            ax.tick_params(labelsize=6)
+            ax.view_init(elev=20, azim=45)
+            ax.set_box_aspect([1,1,1])
+    
+    plt.suptitle(f'{model_name.upper()} - Segmentation Predictions', fontsize=14, weight='bold')
+    plt.tight_layout()
+    
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"Segmentation visualization saved to: {save_path}")
+
+
+def plot_training_curves(train_losses, train_accuracies, test_accuracies, save_path=None):
+    epochs = range(1, len(train_losses) + 1)
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    ax1.plot(epochs, train_losses, 'b-', label='Training Loss', linewidth=2)
+    ax1.set_xlabel('Epoch')
+    ax1.set_ylabel('Loss')
+    ax1.set_title('Training Loss')
+    ax1.grid(True, alpha=0.3)
+    ax1.legend()
+    
+    ax2.plot(epochs, train_accuracies, 'g-', label='Training Accuracy', linewidth=2)
+    ax2.plot(epochs, test_accuracies, 'r-', label='Test Accuracy', linewidth=2)
+    ax2.set_xlabel('Epoch')
+    ax2.set_ylabel('Accuracy (%)')
+    ax2.set_title('Training and Test Accuracy')
+    ax2.grid(True, alpha=0.3)
+    ax2.legend()
+    
+    plt.tight_layout()
+    
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        print(f"Training curves saved to: {save_path}")
+    else:
+        plt.show()
+    
+    plt.close()
