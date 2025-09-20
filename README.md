@@ -1,6 +1,7 @@
 # 3D Scene Understanding
 
 A custom reimplementation of 3D deep learning architectures including **PointNet**, **PointNet++**, **DGCNN**, and **PointMLP** for **point cloud classification and segmentation** tasks. This project uses the **ModelNet10** dataset for classification and **ShapeNetPart** dataset for segmentation tasks.
+=======
 
 ---
 
@@ -11,6 +12,7 @@ A custom reimplementation of 3D deep learning architectures including **PointNet
 - Training and evaluation on **ModelNet10** (classification) and **ShapeNetPart** (segmentation) datasets
 - Comprehensive benchmarking across all model-task combinations
 - TensorBoard logging for training visualization
+=======
 
 ---
 
